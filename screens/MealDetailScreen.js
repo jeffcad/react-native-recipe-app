@@ -12,7 +12,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import CustomHeaderButton from '../components/HeaderButton'
 import DefaultText from '../components/DefaultText'
 import { toggleFavourite } from '../store/actions/actions'
-import Colors from '../constants/Colors'
 
 const ListItem = (props) => {
   return (
@@ -24,16 +23,14 @@ const ListItem = (props) => {
 
 function MealDetailScreen(props) {
 
-  const availableMeals = useSelector(state => state.meals.meals)
-  const mealId = props.navigation.getParam('mealId')
+  const selectedMeal = props.navigation.getParam('selectedMeal')
   const currentMealIsFavourite = useSelector(state =>
-    state.meals.favouriteMeals.some(meal => meal.key === mealId))
-  const selectedMeal = availableMeals.find(meal => meal.key === mealId)
+    state.meals.favouriteMeals.some(meal => meal.key === selectedMeal.key))
 
   const dispatch = useDispatch()
   const toggleFavouriteHandler = useCallback(() => {
-    dispatch(toggleFavourite(mealId))
-  }, [dispatch, mealId])
+    dispatch(toggleFavourite(selectedMeal.key))
+  }, [dispatch, selectedMeal])
 
   useEffect(() => {
     props.navigation.setParams({ toggleFav: toggleFavouriteHandler })
@@ -64,10 +61,9 @@ function MealDetailScreen(props) {
 
 MealDetailScreen.navigationOptions = (navigationData) => {
 
-  const mealTitle = navigationData.navigation.getParam('mealTitle')
+  const mealTitle = navigationData.navigation.getParam('selectedMeal').title
   const toggleFavourite = navigationData.navigation.getParam('toggleFav')
   const isFavourite = navigationData.navigation.getParam('isFav')
-  console.log(isFavourite)
 
   return {
     headerTitle: mealTitle,

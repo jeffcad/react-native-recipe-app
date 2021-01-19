@@ -9,7 +9,7 @@ function MealList(props) {
   const favouriteMeals = useSelector(state => state.meals.favouriteMeals)
 
   const renderMealItem = (itemData) => {
-    const isFavourite = favouriteMeals.some(meal => meal.key = itemData.item.key)
+    const isFavourite = favouriteMeals.some(meal => meal.key === itemData.item.key)
     return (
       <MealItem
         title={itemData.item.title}
@@ -19,8 +19,7 @@ function MealList(props) {
         affordability={itemData.item.affordability}
         onSelectMeal={() => props.navigation.navigate('MealDetail',
           {
-            mealId: itemData.item.key,
-            mealTitle: itemData.item.title,
+            selectedMeal: itemData.item,
             isFav: isFavourite
           }
         )}
