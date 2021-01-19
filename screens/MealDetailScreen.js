@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
 import {
   View,
   Text,
@@ -7,10 +7,12 @@ import {
   StyleSheet
 } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { MEALS } from '../data/dummy-data'
 import CustomHeaderButton from '../components/HeaderButton'
 import DefaultText from '../components/DefaultText'
+import { toggleFavourite } from '../store/actions/actions'
+import Colors from '../constants/Colors'
 
 const ListItem = (props) => {
   return (
@@ -22,8 +24,24 @@ const ListItem = (props) => {
 
 function MealDetailScreen(props) {
 
+  const availableMeals = useSelector(state => state.meals.meals)
   const mealId = props.navigation.getParam('mealId')
-  const selectedMeal = MEALS.find(meal => meal.key === mealId)
+  const currentMealIsFavourite = useSelector(state =>
+    state.meals.favouriteMeals.some(meal => meal.key === mealId))
+  const selectedMeal = availableMeals.find(meal => meal.key === mealId)
+
+  const dispatch = useDispatch()
+  const toggleFavouriteHandler = useCallback(() => {
+    dispatch(toggleFavourite(mealId))
+  }, [dispatch, mealId])
+
+  useEffect(() => {
+    props.navigation.setParams({ toggleFav: toggleFavouriteHandler })
+  }, [toggleFavouriteHandler])
+
+  useEffect(() => {
+    props.navigation.setParams({ isFav: currentMealIsFavourite })
+  }, [currentMealIsFavourite])
 
   return (
     <ScrollView>
@@ -46,19 +64,22 @@ function MealDetailScreen(props) {
 
 MealDetailScreen.navigationOptions = (navigationData) => {
 
-  const mealId = navigationData.navigation.getParam('mealId')
-  const selectedMeal = MEALS.find(meal => meal.key === mealId)
+  const mealTitle = navigationData.navigation.getParam('mealTitle')
+  const toggleFavourite = navigationData.navigation.getParam('toggleFav')
+  const isFavourite = navigationData.navigation.getParam('isFav')
+  console.log(isFavourite)
 
   return {
-    headerTitle: selectedMeal.title,
+    headerTitle: mealTitle,
     headerRight: () => (
       <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
         {/* Can add multiple button items here to get more than 1 */}
         <Item
           title='Favourite'
-          iconName='ios-star'
+          iconName={isFavourite ? 'ios-star' : 'ios-star-outline'}
           iconSize={23}
-          onPress={() => console.log('Marked as favourite')}
+          // color={isFavourite ? Colors.accent : 'white'}
+          onPress={toggleFavourite}
         />
       </HeaderButtons>
     )

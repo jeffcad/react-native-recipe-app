@@ -162,7 +162,7 @@ export const MEALS = [
     ],
     true,
     false,
-    true,
+    false,
     true
   ),
 
